@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Web tỏ tình + Minigame 🌸</title>
+<title>Ở đây có mỗi hai ta😊</title>
 <style>
   body {
     margin: 0; padding: 0;
@@ -26,6 +26,7 @@
     border: 3px dashed #ff6699;
     border-radius: 15px;
     overflow: hidden;
+    display: none;
   }
   .flower, .star {
     position: absolute;
@@ -194,7 +195,7 @@
 </head>
 <body>
 
-<h1>🌸 Web tỏ tình + Minigame 🌸</h1>
+<h1>Ở đây có mỗi hai ta😊</h1>
 
 <!-- Câu hỏi ban đầu -->
 <div id="initialQuestion">
@@ -256,7 +257,6 @@
   const maxSorryClicks = 5;
   let score = 0;
   let timeLeft = 15;
-  let gameInterval;
   let countdownInterval;
 
   // Mảng các chữ rơi: "Thương cậu nhìu lắm"
@@ -285,153 +285,183 @@
       // Hiện video pixel buồn, ẩn nút
       initialQuestion.style.display = 'none';
       sadVideoContainer.style.display = 'block';
-      apologyMsg.textContent = "Mình hiểu rồi... Mình xin lỗi nếu làm phiền cậu nha.";
+      apologyMsg.textContent = "Mình hiểu rồi... Mình xin lỗi nếu làm bạn buồn :(";
       apologyMsg.style.display = 'block';
-      // Tắt hiệu ứng nút
-      sorryBtn.style.display = 'none';
-      agreeBtn.style.display = 'none';
+      chillAudio.pause();
     }
   });
 
-  // Khi click "Đồng ý"
+  // Tạo chữ rơi animation
+  function createFallingChars() {
+    for(let i=0; i<fallingText.length; i++) {
+      const span = document.createElement('span');
+      span.textContent = fallingText[i];
+      span.classList.add('falling-char');
+      span.style.left = Math.random() * (window.innerWidth - 20) + 'px';
+      span.style.animation = `fallDown 3s ease forwards`;
+      span.style.animationDelay = (i * 0.2) + 's';
+      document.body.appendChild(span);
+
+      setTimeout(() => {
+        span.remove();
+      }, 3500);
+    }
+  }
+
+  // Tạo emoji khóc rơi
+  function createFallingEmoji() {
+    const emoji = document.createElement('div');
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.classList.add('falling-emoji');
+    emoji.style.left = Math.random() * (window.innerWidth - 30) + 'px';
+    emoji.style.animation = `emojiFall 4s linear forwards`;
+    document.body.appendChild(emoji);
+    setTimeout(() => emoji.remove(), 4000);
+  }
+
+  // Khi click đồng ý, bắt đầu game
   agreeBtn.addEventListener('click', () => {
     initialQuestion.style.display = 'none';
+    chillAudio.play();
     startGame();
   });
 
-  // Tạo hiệu ứng chữ rơi mượt
-  function createFallingChars() {
-    for(let i = 0; i < fallingText.length; i++) {
-      const span = document.createElement('span');
-      span.textContent = fallingText[i];
-      span.className = 'falling-char';
-      // Random vị trí ngang
-      span.style.left = (Math.random() * window.innerWidth) + 'px';
-      span.style.top = '-30px';
-      span.style.animation = `fallDown 4s ease forwards`;
-      span.style.animationDelay = (i * 0.1) + 's';
-      document.body.appendChild(span);
-
-      // Xóa sau khi animation kết thúc (4s)
-      setTimeout(() => {
-        span.remove();
-      }, 4000);
-    }
-  }
-
-  // Tạo emoji rơi buồn mượt
-  function createFallingEmoji() {
-    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-    const span = document.createElement('span');
-    span.textContent = emoji;
-    span.className = 'falling-emoji';
-    span.style.left = (Math.random() * window.innerWidth) + 'px';
-    span.style.top = '-40px';
-    span.style.animation = 'emojiFall 5s linear forwards';
-    document.body.appendChild(span);
-    setTimeout(() => {
-      span.remove();
-    }, 5000);
-  }
-
-  // Bắt đầu minigame
+  // Bắt đầu game mini nhặt hoa (đơn giản)
   function startGame() {
     score = 0;
     timeLeft = 15;
-    scoreboard.textContent = "Điểm: 0";
-    timeLeftDisplay.textContent = `Thời gian: ${timeLeft} giây`;
+    scoreboard.textContent = "Điểm: " + score;
+    timeLeftDisplay.textContent = "Thời gian: " + timeLeft + " giây";
     gameArea.style.display = 'block';
-    scoreboard.style.display = 'block';
-    timeLeftDisplay.style.display = 'block';
-    apologyMsg.style.display = 'none';
     postGameQuestion.style.display = 'none';
+    apologyMsg.style.display = 'none';
     nuzzleMessage.style.display = 'none';
     chatBox.style.display = 'none';
-
-    chillAudio.currentTime = 0;
-    chillAudio.play();
 
     spawnFlower();
 
     countdownInterval = setInterval(() => {
       timeLeft--;
-      timeLeftDisplay.textContent = `Thời gian: ${timeLeft} giây`;
-      if (timeLeft <= 0) {
-        endGame();
+      timeLeftDisplay.textContent = "Thời gian: " + timeLeft + " giây";
+      if(timeLeft <= 0) {
+        clearInterval(countdownInterval);
+        gameArea.style.display = 'none';
+        postGameQuestion.style.display = 'block';
       }
     }, 1000);
   }
 
-  // Kết thúc game
-  function endGame() {
-    clearInterval(countdownInterval);
-    chillAudio.pause();
-
-    gameArea.innerHTML = '';
-    gameArea.style.display = 'none';
-    scoreboard.style.display = 'none';
-    timeLeftDisplay.style.display = 'none';
-
-    if(score >= 5) {
-      // Nếu điểm cao, hỏi thêm
-      postGameQuestion.style.display = 'block';
-    } else {
-      apologyMsg.textContent = "Chơi được vậy rồi, tớ nựng cậu một xíu 🥰";
-      apologyMsg.style.display = 'block';
-      nuzzleMessage.style.display = 'block';
-    }
-  }
-
-  // Tạo bông hoa rơi, người chơi click để cộng điểm
+  // Tạo hoa ngẫu nhiên trong vùng game
   function spawnFlower() {
+    if(timeLeft <= 0) return;
+
     const flower = document.createElement('div');
-    flower.className = 'flower';
-
-    // Bắt đầu từ trên cùng, vị trí ngẫu nhiên ngang
-    flower.style.left = Math.random() * (gameArea.clientWidth - 40) + 'px';
-    flower.style.top = '-50px';
-
-    gameArea.appendChild(flower);
-
-    // Tạo animation rơi mượt
-    let position = -50;
-    const speed = 1 + Math.random() * 2; // vận tốc rơi
-
-    function fall() {
-      position += speed;
-      flower.style.top = position + 'px';
-
-      if(position > gameArea.clientHeight) {
-        // Nếu rơi ra ngoài thì xóa và tạo hoa mới
-        flower.remove();
-        if(timeLeft > 0) spawnFlower();
-      } else {
-        requestAnimationFrame(fall);
-      }
-    }
-    requestAnimationFrame(fall);
+    flower.classList.add('flower');
+    const x = Math.random() * (gameArea.clientWidth - 40);
+    const y = Math.random() * (gameArea.clientHeight - 40);
+    flower.style.left = x + 'px';
+    flower.style.top = y + 'px';
 
     flower.addEventListener('click', () => {
       score++;
-      scoreboard.textContent = `Điểm: ${score}`;
+      scoreboard.textContent = "Điểm: " + score;
       flower.remove();
-      if(timeLeft > 0) spawnFlower();
+      spawnFlower();
     });
+
+    gameArea.appendChild(flower);
   }
 
-  // Xử lý nút sau game
+  // Xử lý nút chat và ở lại
   chatBtn.addEventListener('click', () => {
-    postGameQuestion.style.display = 'none';
-    chatBox.style.display = 'block';
-    // Dẫn link Facebook (ví dụ)
-    window.open('https://www.facebook.com/messages/t/', '_blank');
+    window.location.href = "https://www.facebook.com/luongduc1234";
   });
 
   stayBtn.addEventListener('click', () => {
     postGameQuestion.style.display = 'none';
     nuzzleMessage.style.display = 'block';
+
+    setTimeout(() => {
+      nuzzleMessage.style.display = 'none';
+      startEasyGame();
+    }, 2500);
   });
 
+  // Minigame dễ
+  function startEasyGame() {
+    score = 0;
+    timeLeft = 10;
+    scoreboard.textContent = "Điểm: " + score;
+    timeLeftDisplay.textContent = "Thời gian: " + timeLeft + " giây";
+    gameArea.style.display = 'block';
+
+    // Thay đổi hoa thành sao cho khác game 1
+    gameArea.innerHTML = ''; // reset
+
+    spawnStar();
+
+    countdownInterval = setInterval(() => {
+      timeLeft--;
+      timeLeftDisplay.textContent = "Thời gian: " + timeLeft + " giây";
+      if(timeLeft <= 0) {
+        clearInterval(countdownInterval);
+        gameArea.style.display = 'none';
+        showFinalMessage();
+      }
+    }, 1000);
+  }
+
+  // Tạo sao trong game dễ
+  function spawnStar() {
+    if(timeLeft <= 0) return;
+
+    const star = document.createElement('div');
+    star.classList.add('star');
+    const x = Math.random() * (gameArea.clientWidth - 30);
+    const y = Math.random() * (gameArea.clientHeight - 30);
+    star.style.left = x + 'px';
+    star.style.top = y + 'px';
+
+    star.addEventListener('click', () => {
+      score++;
+      scoreboard.textContent = "Điểm: " + score;
+      star.remove();
+      spawnStar();
+    });
+
+    gameArea.appendChild(star);
+  }
+
+  // Tin nhắn cuối cùng với hiệu ứng chữ rơi và emoji khóc
+  function showFinalMessage() {
+    apologyMsg.textContent = '';
+    apologyMsg.style.display = 'block';
+    const message = "vk oi anh xin loi: <a hk de vo buon nx nha";
+
+    // Tạo từng chữ rơi xuống
+    let delay = 0;
+    for(let i=0; i<message.length; i++) {
+      setTimeout(() => {
+        const span = document.createElement('span');
+        span.textContent = message[i];
+        span.classList.add('falling-char');
+        span.style.left = Math.random() * (window.innerWidth - 20) + 'px';
+        span.style.animation = `fallDown 4s ease forwards`;
+        document.body.appendChild(span);
+        setTimeout(() => span.remove(), 4500);
+      }, delay);
+      delay += 150;
+    }
+
+    // Tạo emoji khóc rơi nhiều lần
+    let emojiCount = 0;
+    const emojiInterval = setInterval(() => {
+      createFallingEmoji();
+      emojiCount++;
+      if(emojiCount > 15) clearInterval(emojiInterval);
+    }, 200);
+  }
 </script>
+
 </body>
 </html>
